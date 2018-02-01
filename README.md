@@ -14,5 +14,5 @@ const ExifTransformer = require('exif-be-gone')
 const reader = fs.createReadStream('Canon_40D.jpg')
 const writer = fs.createWriteStream('out.jpg')
 
-toStream(img).pipe(new ExifTransformer()).pipe(writer)
+toStream(reader).pipe(new ExifTransformer()).pipe(writer)
 ```

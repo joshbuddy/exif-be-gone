@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/repo
     docker:
-      - image: circleci/node:4.8.2
+      - image: circleci/node
       - image: mongo:3.4.4
     steps:
       - checkout
@@ -13,7 +13,7 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: install-npm-wee
+          name: install dependencies
           command: npm install
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}

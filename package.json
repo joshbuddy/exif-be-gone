@@ -1,7 +1,7 @@
 {
   "name": "exif-be-gone",
   "version": "1.0.0",
-  "description": "",
+  "description": "Remove EXIF data from your image files.",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec spec/*_spec.js",
@@ -9,6 +9,10 @@
     "lintfix": "standard --fix"
   },
   "author": "Josh Hull",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshbuddy/exif-be-gone.git"
+  },
   "license": "ISC",
   "devDependencies": {
     "chai": "4.2.0",

@@ -7,36 +7,51 @@ module.exports = class ExifTransformer extends stream.Transform {
   constructor (options) {
     super(options)
     this.remainingBytes = null
+    this.pending = []
   }
 
   _transform (chunk, encoding, callback) {
-    if (chunk.length === 0) return callback()
+    let pendingChunk = Buffer.concat([...this.pending, chunk])
+    if (pendingChunk.length === 0) return callback()
     if (this.remainingBytes === null) {
-      var app1Start = chunk.indexOf(app1Marker)
-      if (app1Start === -1 || !chunk.slice(app1Start + 4, app1Start + 10).equals(exifMarker)) {
-        this.push(chunk)
-        return callback()
+      var app1Start = pendingChunk.indexOf(app1Marker)
+      if (app1Start === -1) {
+        // if last byte is ff, wait for more
+        if (pendingChunk[pendingChunk.length - 1] === app1Marker[0]) {
+          this.pending.push(chunk)
+          return callback()
+        }
+      } else {
+        if (app1Start + 10 > pendingChunk.length) {
+          this.pending.push(chunk)
+          return callback()
+        } else {
+          const candidateMarker = pendingChunk.slice(app1Start + 4, app1Start + 10)
+          if (candidateMarker.equals(exifMarker)) {
+            this.remainingBytes = pendingChunk.readInt16BE(app1Start + 2) + 2
+            this.push(pendingChunk.slice(0, app1Start))
+            pendingChunk = pendingChunk.slice(app1Start)
+          }
+        }
       }
-
-      this.remainingBytes = chunk.readInt16BE(app1Start + 2)
-      this.push(chunk.slice(0, app1Start))
-      chunk = chunk.slice(app1Start)
     }
 
-    if (chunk.length > this.remainingBytes + 1) {
-      this.push(chunk.slice(this.remainingBytes + 1))
-      this.remainingBytes = null
+    if (this.remainingBytes !== null) {
+      if (pendingChunk.length >= this.remainingBytes) {
+        this.push(pendingChunk.slice(this.remainingBytes))
+        this.remainingBytes = null
+      } else {
+        this.remainingBytes -= pendingChunk.length
+      }
     } else {
-      this.remainingBytes -= chunk.length
+      this.push(pendingChunk)
     }
-    callback()
-  }
-
-  _flush (callback) {
+    this.pending.length = 0
     callback()
   }
 
   _final (callback) {
+    if (this.pending.length) this.push(Buffer.concat(this.pending))
     callback()
   }
 }

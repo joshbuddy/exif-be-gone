@@ -1,19 +1,22 @@
-const stream = require('stream')
+import { Transform, TransformOptions, TransformCallback } from "stream"
 
 const app1Marker = Buffer.from('ffe1', 'hex')
 const exifMarker = Buffer.from('457869660000', 'hex') // Exif\0\0
 
-module.exports = class ExifTransformer extends stream.Transform {
-  constructor (options) {
+class ExifTransformer extends Transform {
+  remainingBytes?: number
+  pending: Array<Buffer>
+
+  constructor (options?: TransformOptions) {
     super(options)
-    this.remainingBytes = null
+    this.remainingBytes = undefined
     this.pending = []
   }
 
-  _transform (chunk, encoding, callback) {
+  _transform (chunk: any, encoding: string, callback: TransformCallback) {
     let pendingChunk = Buffer.concat([...this.pending, chunk])
     if (pendingChunk.length === 0) return callback()
-    if (this.remainingBytes === null) {
+    if (this.remainingBytes === undefined) {
       var app1Start = pendingChunk.indexOf(app1Marker)
       if (app1Start === -1) {
         // if last byte is ff, wait for more
@@ -36,10 +39,10 @@ module.exports = class ExifTransformer extends stream.Transform {
       }
     }
 
-    if (this.remainingBytes !== null) {
+    if (this.remainingBytes !== undefined) {
       if (pendingChunk.length >= this.remainingBytes) {
         this.push(pendingChunk.slice(this.remainingBytes))
-        this.remainingBytes = null
+        this.remainingBytes = undefined
       } else {
         this.remainingBytes -= pendingChunk.length
       }
@@ -50,8 +53,10 @@ module.exports = class ExifTransformer extends stream.Transform {
     callback()
   }
 
-  _final (callback) {
+  _final (callback: TransformCallback) {
     if (this.pending.length) this.push(Buffer.concat(this.pending))
     callback()
   }
 }
+
+export = ExifTransformer

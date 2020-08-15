@@ -4,10 +4,10 @@
   "description": "Remove EXIF data from your image files.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc **/*.ts",
+    "build": "tsc *.ts **/*.ts",
     "test": "npm run build && mocha -R spec spec/*_spec.js",
-    "lint": "standardx **/*.ts",
-    "lintfix": "standardx **/*.ts --fix"
+    "lint": "standardx *.ts **/*.ts",
+    "lintfix": "standardx *.ts **/*.ts --fix"
   },
   "author": "Josh Hull",
   "repository": {

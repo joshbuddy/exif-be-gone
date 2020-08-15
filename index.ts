@@ -1,4 +1,4 @@
-import { Transform, TransformOptions, TransformCallback } from "stream"
+import { Transform, TransformOptions, TransformCallback } from 'stream'
 
 const app1Marker = Buffer.from('ffe1', 'hex')
 const exifMarker = Buffer.from('457869660000', 'hex') // Exif\0\0

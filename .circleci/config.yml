@@ -17,7 +17,7 @@ jobs:
             - ./node_modules
       - run:
           name: install exiftool
-          command: apt update && apt install -y exiftool
+          command: sudo apt update && sudo apt install -y exiftool
       - run:
           name: lint
           command: npm run lint

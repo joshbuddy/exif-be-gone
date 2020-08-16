@@ -3,6 +3,8 @@
 set -e
 shopt -s nullglob
 
+which exiftool
+
 test_jpg() {
 	if [ $(exiftool $1 | grep -i gps | grep -c -i -v version) -eq 0 ]; then
 		echo "no gps data in $1"

@@ -4,9 +4,10 @@
   "description": "Remove EXIF data from your image files.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R spec spec/*_spec.js",
-    "lint": "standard",
-    "lintfix": "standard --fix"
+    "build": "tsc -p . && chmod 755 cli.js",
+    "test": "npm run build && mocha -R spec spec/*.spec.js",
+    "lint": "standardx *.ts **/*.ts",
+    "lintfix": "standardx *.ts **/*.ts --fix"
   },
   "author": "Josh Hull",
   "repository": {
@@ -14,11 +15,33 @@
     "url": "https://github.com/joshbuddy/exif-be-gone.git"
   },
   "license": "ISC",
+  "dependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.2",
+    "@types/node": "^14.0.27",
+    "@types/stream-buffers": "^3.0.3"
+  },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.9.0",
+    "buffer-to-stream": "1.0.0",
     "chai": "4.2.0",
     "mocha": "8.1.1",
-    "standard": "14.3.4",
-    "buffer-to-stream": "1.0.0",
-    "stream-buffers": "^3.0.2"
+    "standardx": "^5.0.0",
+    "stream-buffers": "^3.0.2",
+    "typescript": "^3.9.7",
+    "typescript-eslint": "0.0.1-alpha.0"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error"
+    }
+  },
+  "standardx": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ]
   }
 }

@@ -4,7 +4,7 @@
   "description": "Remove EXIF data from your image files.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc *.ts **/*.ts",
+    "build": "tsc -p . && chmod 755 cli.js",
     "test": "npm run build && mocha -R spec spec/*_spec.js",
     "lint": "standardx *.ts **/*.ts",
     "lintfix": "standardx *.ts **/*.ts --fix"

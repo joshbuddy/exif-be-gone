@@ -22,7 +22,7 @@ jobs:
           name: lint
           command: npm run lint
       - run:
-          name: buils
+          name: build
           command: npm run build
       - run:
           name: test

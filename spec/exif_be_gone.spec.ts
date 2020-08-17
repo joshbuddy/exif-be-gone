@@ -27,11 +27,13 @@ describe('Exif be gone', () => {
         Buffer.from('457869', 'hex'),
         Buffer.from('660000', 'hex'),
         Buffer.from('0001020304050607', 'hex'),
+        Buffer.from('08090a0b0c0d0e0f', 'hex'),
+        Buffer.from('0001020304050607', 'hex'),
         Buffer.from('08090a0b0c0d0e0f', 'hex')
       ])
       readable.pipe(new ExifBeGone()).pipe(writer).on('finish', () => {
         const output = writer.getContents()
-        assert.equal(output.length, 16)
+        assert.equal(output.length, 32)
         done()
       })
     })

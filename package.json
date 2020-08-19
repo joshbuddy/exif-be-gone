@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc -p . && chmod 755 cli.js",
     "test": "npm run build && mocha -R spec spec/*.spec.js",
+    "test-samples": "npm run build && ./script/test.sh",
     "lint": "standardx *.ts **/*.ts",
     "lintfix": "standardx *.ts **/*.ts --fix"
   },

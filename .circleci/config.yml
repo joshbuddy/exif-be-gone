@@ -7,14 +7,10 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: cache-{{ checksum "package.json" }}
       - run:
           name: install dependencies
           command: npm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
-          paths:
-            - ./node_modules
       - run:
           name: install exiftool
           command: sudo apt update && sudo apt install -y exiftool
@@ -22,11 +18,14 @@ jobs:
           name: lint
           command: npm run lint
       - run:
-          name: build
-          command: npm run build
-      - run:
           name: test
           command: npm test
       - run:
           name: test samples
-          command: ./script/test.sh
+          command: npm run test-samples
+      - save_cache:
+          key: cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+            - ./exif-samples
+            - ./metadata-extractor-images

@@ -1,6 +1,8 @@
 # Exif be gone
 
-Stream transformer to remove exif data
+Stream transformer to remove data that could be potentially private.
+
+It currently looks for data in the app1 section that is either exif, xmp, or FLIR and removes it from the stream.
 
 ## Installation
 
@@ -16,3 +18,7 @@ const writer = fs.createWriteStream('out.jpg')
 
 toStream(reader).pipe(new ExifTransformer()).pipe(writer)
 ```
+
+There is also a command-line version that is installed that can be run via:
+
+`$ exif-be-gone [INPUT] [OUTPUT]`

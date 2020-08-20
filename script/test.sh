@@ -7,8 +7,11 @@ which exiftool
 
 test_file() {
 	echo "Considering file ${f}"
+
 	set +e
-	pre_exif_out=$(exiftool "${f}")
+	local pre_exif_out=$(exiftool "${f}")
+	set -e
+
 	if [ $? -ne 0 ]; then
 		echo "Skipping $1, exiftool couldn't read it"
 		return
@@ -18,19 +21,17 @@ test_file() {
 		return
 	fi
 
-	set -e
 
 	./cli.js "$1" out.jpg
 
 	set +e
-
-	post_exif_out=$(exiftool out.jpg) 
+	local post_exif_out=$(exiftool out.jpg)
+	set -e
 
 	if [ $? -ne 0 ]; then
 		echo "After scrubbing $1, couldn't run exiftool\n\npre exiftool output was\n\n$pre_exif_out\n\npost exiftool output was\n\n$post_exif_out"
 		exit 1
 	fi
-	set -e
 
 	# ./metadata-extractor-images/jpg/Nikon E995 (iptc).jpg has '(GPS)' in it
 	if [ $(echo $post_exif_out | grep -i gps | grep -i -v version | grep -c -i -v '(gps)') -ne 0 ]; then

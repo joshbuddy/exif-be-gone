@@ -20,6 +20,10 @@ test_file() {
 		echo "No mime-type detected, skipping $1"
 		return
 	fi
+	if [ $(echo $pre_exif_out | grep -c -i 'warning') -eq 1 ]; then
+		echo "Skipping $1 due to warning"
+		return
+	fi
 
 
 	./cli.js "$1" out.jpg

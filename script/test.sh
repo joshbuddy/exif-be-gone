@@ -7,7 +7,14 @@ which exiftool
 
 test_file() {
 	echo "Considering file ${f}"
-	pre_exif_out=$(exiftool "${f}") 
+	set +e
+	pre_exif_out=$(exiftool "${f}")
+	if [ $? -ne 0 ]; then
+		echo "Skipping $1, exiftool couldn't read it"
+		return
+	fi
+	set -e
+
 	./cli.js "$1" out.jpg
 	post_exif_out=$(exiftool out.jpg) 
 
@@ -43,6 +50,7 @@ else
 	echo "Updating metadata-extractor-images"
 	cd metadata-extractor-images; git pull; cd ..
 fi
+
 
 find exif-samples metadata-extractor-images \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.tiff" \) | while read f
 do

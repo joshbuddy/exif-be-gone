@@ -5,6 +5,8 @@ const exifMarker = Buffer.from('457869660000', 'hex') // Exif\0\0
 const xmpMarker = Buffer.from('http://ns.adobe.com/xap', 'utf-8')
 const flirMarker = Buffer.from('FLIR', 'utf-8')
 
+const maxMarkerLength = Math.max(exifMarker.length, xmpMarker.length, flirMarker.length)
+
 class ExifTransformer extends Transform {
   remainingBytes?: number
   pending: Array<Buffer>
@@ -42,7 +44,7 @@ class ExifTransformer extends Transform {
       } else {
         // there is an app1, but not enough data to read to exif marker
         // so defer
-        if (app1Start + 27 > pendingChunk.length) {
+        if (app1Start + maxMarkerLength + 4 > pendingChunk.length) {
           if (atEnd) {
             this.push(pendingChunk)
             this.pending.length = 0
@@ -52,10 +54,10 @@ class ExifTransformer extends Transform {
           return
         // we have enough, so lets read the length
         } else {
-          const candidateMarker = pendingChunk.slice(app1Start + 4, app1Start + 27)
+          const candidateMarker = pendingChunk.slice(app1Start + 4, app1Start + maxMarkerLength + 4)
           if (exifMarker.compare(candidateMarker, 0, exifMarker.length) === 0 || xmpMarker.compare(candidateMarker, 0, xmpMarker.length) === 0 || flirMarker.compare(candidateMarker, 0, flirMarker.length) === 0) {
             // we add 2 to the remainingBytes to account for the app1 marker
-            this.remainingBytes = pendingChunk.readInt16BE(app1Start + 2) + 2
+            this.remainingBytes = pendingChunk.readUInt16BE(app1Start + 2) + 2
             this.push(pendingChunk.slice(0, app1Start))
             pendingChunk = pendingChunk.slice(app1Start)
           }

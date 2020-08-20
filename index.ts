@@ -57,7 +57,7 @@ class ExifTransformer extends Transform {
           const candidateMarker = pendingChunk.slice(app1Start + 4, app1Start + maxMarkerLength + 4)
           if (exifMarker.compare(candidateMarker, 0, exifMarker.length) === 0 || xmpMarker.compare(candidateMarker, 0, xmpMarker.length) === 0 || flirMarker.compare(candidateMarker, 0, flirMarker.length) === 0) {
             // we add 2 to the remainingBytes to account for the app1 marker
-            this.remainingBytes = pendingChunk.readInt16BE(app1Start + 2) + 2
+            this.remainingBytes = pendingChunk.readUInt16BE(app1Start + 2) + 2
             this.push(pendingChunk.slice(0, app1Start))
             pendingChunk = pendingChunk.slice(app1Start)
           }

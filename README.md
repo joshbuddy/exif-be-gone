@@ -12,11 +12,12 @@ Use `npm install exif-be-gone` to install this package.
 
 ```javascript
 const ExifTransformer = require('exif-be-gone')
+const fs = require("fs")
 
 const reader = fs.createReadStream('Canon_40D.jpg')
 const writer = fs.createWriteStream('out.jpg')
 
-toStream(reader).pipe(new ExifTransformer()).pipe(writer)
+reader.pipe(new ExifTransformer()).pipe(writer)
 ```
 
 There is also a command-line version that is installed that can be run via:

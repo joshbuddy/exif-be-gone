@@ -16,20 +16,16 @@ test_file() {
 		echo "Skipping $1, exiftool couldn't read it"
 		return
 	fi
-	if [ $(echo $pre_exif_out | grep -c -E 'image/jpeg|image/tiff') -eq 0 ]; then
-		echo "No mime-type detected, skipping $1"
-		return
-	fi
 	if [ $(echo $pre_exif_out | grep -c -i 'warning') -eq 1 ]; then
 		echo "Skipping $1 due to warning"
 		return
 	fi
 
 
-	./cli.js "$1" out.jpg
+	./cli.js "$1" scrubbed-out
 
 	set +e
-	local post_exif_out=$(exiftool out.jpg)
+	local post_exif_out=$(exiftool scrubbed-out)
 	set -e
 
 	if [ $? -ne 0 ]; then
@@ -39,20 +35,13 @@ test_file() {
 
 	# ./metadata-extractor-images/jpg/Nikon E995 (iptc).jpg has '(GPS)' in it
 	if [ $(echo $post_exif_out | grep -i gps | grep -i -v version | grep -c -i -v '(gps)') -ne 0 ]; then
-		echo "After scrubbing $1, still found 'gps' present\n\nexiftool output was\n\n$exif_out"
+		echo "After scrubbing $1, still found 'gps' present\n\nexiftool output was\n\n$post_exif_out"
 		exit 1
 	fi
 
 	if [ $(echo $post_exif_out | grep -c -i coordinates) -ne 0 ]; then
-		echo "After scrubbing $1, still found 'coordinates' present\n\nexiftool output was\n\n$exif_out"
+		echo "After scrubbing $1, still found 'coordinates' present\n\nexiftool output was\n\n$post_exif_out"
 		exit 1
-	fi
-
-	if [ $(echo $pre_exif_out | grep -c -E 'image/jpeg|image/tiff') -eq 1 ]; then
-		if [ $(echo $post_exif_out | grep -c -E 'image/jpeg|image/tiff') -eq 0 ]; then
-			echo "After scrubbing $1, couldn't find mimetype\n\npre exiftool output was\n\n$pre_exif_out\n\npost exiftool output was\n\n$post_exif_out"
-			exit 1
-		fi
 	fi
 }
 
@@ -70,7 +59,7 @@ else
 	cd metadata-extractor-images; git pull; cd ..
 fi
 
-find exif-samples metadata-extractor-images \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.tiff" \) | while read f
+find exif-samples metadata-extractor-images -type f -not -path '*/\.git/*' -not -name '*.mp4' -not -name '*.txt' -not -name '*.mov' | while read f
 do
 	test_file "$f"
 done

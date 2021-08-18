@@ -59,7 +59,7 @@ else
 	cd metadata-extractor-images; git pull; cd ..
 fi
 
-find exif-samples metadata-extractor-images -type f -not -path '*/\.git/*' -not -name '*.mp4' -not -name '*.txt' | while read f
+find exif-samples metadata-extractor-images -type f -not -path '*/\.git/*' -not -name '*.mp4' -not -name '*.txt' -not -name '*.mov' | while read f
 do
 	test_file "$f"
 done

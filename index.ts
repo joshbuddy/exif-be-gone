@@ -86,4 +86,5 @@ class ExifTransformer extends Transform {
   }
 }
 
-export = ExifTransformer
+export default ExifTransformer
+module.exports = ExifTransformer

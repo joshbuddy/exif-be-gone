@@ -17,7 +17,7 @@ class ExifTransformer extends Transform {
     this.pending = []
   }
 
-  _transform (chunk: any, encoding: string, callback: TransformCallback) {
+  _transform (chunk: any, _: string, callback: TransformCallback) {
     this._scrub(false, chunk)
     callback()
   }
@@ -33,7 +33,7 @@ class ExifTransformer extends Transform {
     let pendingChunk = chunk ? Buffer.concat([...this.pending, chunk]) : Buffer.concat(this.pending)
     // currently haven't detected an app1 marker
     if (this.remainingBytes === undefined) {
-      var app1Start = pendingChunk.indexOf(app1Marker)
+      const app1Start = pendingChunk.indexOf(app1Marker)
       // no app1 in the current pendingChunk
       if (app1Start === -1) {
         // if last byte is ff, wait for more

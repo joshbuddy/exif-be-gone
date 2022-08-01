@@ -1,0 +1,49 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [14, 16, 18]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Check linting
+        run: npm run lint
+      - name: Copy previous build
+        run: cp index.js previous.js
+      - name: Build new javascript version
+        run: npm run build
+      - name: Check build is up-to-date
+        run: diff -q previous.js index.js
+      - name: Run tests
+        run: npm run test
+      - name: Install exiftool
+        run: sudo apt-get install -y exiftool
+      - uses: actions/cache@v3
+        id: cache-exif-samples
+        with:
+          path: exif-samples
+          key: exif-samples
+      - uses: actions/cache@v3
+        id: cache-metadata-extractor-images
+        with:
+          path: metadata-extractor-images
+          key: metadata-extractor-images
+      - name: Run large sample suite
+        run: npm run test:samples

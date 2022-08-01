@@ -46,14 +46,14 @@ test_file() {
 }
 
 if [ ! -d exif-samples ]; then
-	git clone git@github.com:ianare/exif-samples.git
+	git clone https://github.com/ianare/exif-samples.git
 else
 	echo "Updating exif-samples"
 	cd exif-samples; git pull; cd ..
 fi
 
 if [ ! -d metadata-extractor-images ]; then
-	git clone git@github.com:drewnoakes/metadata-extractor-images.git
+	git clone https://github.com/drewnoakes/metadata-extractor-images.git
 else
 	echo "Updating metadata-extractor-images"
 	cd metadata-extractor-images; git pull; cd ..

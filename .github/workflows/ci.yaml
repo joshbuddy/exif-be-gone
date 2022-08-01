@@ -46,4 +46,4 @@ jobs:
           path: metadata-extractor-images
           key: metadata-extractor-images
       - name: Run large sample suite
-        run: run run test:samples
+        run: npm run test:samples

@@ -17,7 +17,7 @@ class ExifTransformer extends Transform {
     this.pending = []
   }
 
-  _transform (chunk: any, encoding: string, callback: TransformCallback) {
+  _transform (chunk: any, _: string, callback: TransformCallback) {
     this._scrub(false, chunk)
     callback()
   }

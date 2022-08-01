@@ -1,6 +1,6 @@
 /* global it, describe */
 
-var streamBuffers = require('stream-buffers')
+const streamBuffers = require('stream-buffers')
 const assert = require('chai').assert
 const fs = require('fs')
 const ExifBeGone = require('..')

@@ -45,5 +45,5 @@ jobs:
         run: diff -q previous.js index.js
       - name: Run tests
         run: npm run test
-      - name: Run large test suite
-        run: ./scripts/test.sh
+      - name: Run large sample suite
+        run: run run test:samples

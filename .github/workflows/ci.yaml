@@ -18,6 +18,16 @@ jobs:
     steps:
       - name: Install exiftool
         run: sudo apt-get install -y exiftool
+      - uses: actions/cache@v3
+        id: cache-exif-samples
+        with:
+          path: exif-samples
+          key: exif-samples
+      - uses: actions/cache@v3
+        id: cache-metadata-extractor-images
+        with:
+          path: metadata-extractor-images
+          key: metadata-extractor-images
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3

@@ -8,7 +8,7 @@ const flirMarker = Buffer.from('FLIR', 'utf-8')
 const maxMarkerLength = Math.max(exifMarker.length, xmpMarker.length, flirMarker.length)
 
 class ExifTransformer extends Transform {
-  remainingBytes?: number
+  remainingBytes?: number | undefined
   pending: Array<Buffer>
 
   constructor (options?: TransformOptions) {
@@ -17,12 +17,12 @@ class ExifTransformer extends Transform {
     this.pending = []
   }
 
-  _transform (chunk: any, _: string, callback: TransformCallback) {
+  override _transform (chunk: any, _: string, callback: TransformCallback) {
     this._scrub(false, chunk)
     callback()
   }
 
-  _final (callback: TransformCallback) {
+  override _final (callback: TransformCallback) {
     while (this.pending.length !== 0) {
       this._scrub(true)
     }

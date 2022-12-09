@@ -2,7 +2,7 @@
 /// <reference types="node" />
 import { Transform, TransformOptions, TransformCallback } from 'stream';
 declare class ExifTransformer extends Transform {
-    remainingBytes?: number;
+    remainingBytes?: number | undefined;
     pending: Array<Buffer>;
     constructor(options?: TransformOptions);
     _transform(chunk: any, _: string, callback: TransformCallback): void;

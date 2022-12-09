@@ -8,7 +8,7 @@ const flirMarker = Buffer.from('FLIR', 'utf-8')
 const maxMarkerLength = Math.max(exifMarker.length, xmpMarker.length, flirMarker.length)
 
 class ExifTransformer extends Transform {
-  remainingBytes?: number | undefined
+  remainingBytes: number | undefined
   pending: Array<Buffer>
 
   constructor (options?: TransformOptions) {

@@ -30,7 +30,7 @@
     "@typescript-eslint/parser": "^3.9.0",
     "buffer-to-stream": "1.0.0",
     "chai": "4.2.0",
-    "mocha": "8.1.1",
+    "mocha": "10.1.0",
     "standardx": "^7.0.0",
     "stream-buffers": "^3.0.2",
     "typescript": "^4.7.4",

@@ -1,13 +1,18 @@
 /// <reference types="node" />
 /// <reference types="node" />
-import { Transform, TransformOptions, TransformCallback } from 'stream';
+import { Transform, type TransformOptions, type TransformCallback } from 'stream';
 declare class ExifTransformer extends Transform {
-    remainingBytes: number | undefined;
+    remainingScrubBytes: number | undefined;
+    remainingGoodBytes: number | undefined;
     pending: Array<Buffer>;
+    mode: 'png' | 'other' | undefined;
     constructor(options?: TransformOptions);
-    _transform(chunk: any, _: string, callback: TransformCallback): void;
+    _transform(chunk: any, _: BufferEncoding, callback: TransformCallback): void;
     _final(callback: TransformCallback): void;
     _scrub(atEnd: Boolean, chunk?: Buffer): void;
+    _scrubOther(atEnd: Boolean, chunk?: Buffer): void;
+    _scrubPNG(atEnd: Boolean, chunk?: Buffer): void;
+    _processPNGGood(chunk: Buffer): Buffer;
 }
 export default ExifTransformer;
 //# sourceMappingURL=index.d.ts.map

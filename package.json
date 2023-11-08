@@ -6,6 +6,7 @@
   "bin": {
     "exif-be-gone": "./cli.js"
   },
+  "types": "index.d.ts",
   "scripts": {
     "build": "tsc -p . && chmod 755 cli.js",
     "test": "npm run build && mocha -R spec spec/*.spec.js",

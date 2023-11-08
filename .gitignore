@@ -2,3 +2,5 @@
 /build
 /tsconfig.tsbuildinfo
 /scrubbed-out
+/exif-samples
+/metadata-extractor-images

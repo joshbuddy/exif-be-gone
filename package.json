@@ -4,7 +4,7 @@
   "description": "Remove EXIF data from your image files.",
   "main": "index.js",
   "bin": {
-    "exif-be-gone": "./cli.js"
+    "exif-be-gone": "cli.js"
   },
   "types": "index.d.ts",
   "scripts": {
@@ -17,7 +17,7 @@
   "author": "Josh Hull",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joshbuddy/exif-be-gone.git"
+    "url": "git+https://github.com/joshbuddy/exif-be-gone.git"
   },
   "license": "ISC",
   "dependencies": {
@@ -38,7 +38,9 @@
     "typescript-eslint": "0.0.1-alpha.0"
   },
   "eslintConfig": {
-    "ignorePatterns": ["**/*.d.ts"],
+    "ignorePatterns": [
+      "**/*.d.ts"
+    ],
     "rules": {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "error"
@@ -49,5 +51,14 @@
     "plugins": [
       "@typescript-eslint/eslint-plugin"
     ]
-  }
+  },
+  "files": [
+    "README.md",
+    "index.ts",
+    "index.d.ts",
+    "index.d.ts.map",
+    "index.js",
+    "tsconfig.json",
+    "cli.js"
+  ]
 }

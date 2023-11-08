@@ -43,9 +43,15 @@ test_file() {
 		echo "After scrubbing $1, still found 'coordinates' present\n\nexiftool output was\n\n$post_exif_out"
 		exit 1
 	fi
+
+	if [ $(echo $post_exif_out | grep -c -i 'digital signature') -ne 0 ]; then
+		echo "After scrubbing $1, still found 'digital signature' present\n\nexiftool output was\n\n$post_exif_out"
+		exit 1
+	fi
 }
 
 if [ ! -d exif-samples ]; then
+	echo "Cloning exif-samples"
 	git clone https://github.com/ianare/exif-samples.git
 else
 	echo "Updating exif-samples"
@@ -53,13 +59,14 @@ else
 fi
 
 if [ ! -d metadata-extractor-images ]; then
+	echo "Cloning metadata-extractor-images"
 	git clone https://github.com/drewnoakes/metadata-extractor-images.git
 else
 	echo "Updating metadata-extractor-images"
 	cd metadata-extractor-images; git pull; cd ..
 fi
 
-find exif-samples metadata-extractor-images -type f -not -path '*/\.git/*' -not -name '*.mp4' -not -name '*.txt' -not -name '*.mov' | while read f
+find samples exif-samples metadata-extractor-images -type f -not -path '*/\.git/*' -not -name '*.mp4' -not -name '*.txt' -not -name '*.mov' | while read f
 do
 	test_file "$f"
 done

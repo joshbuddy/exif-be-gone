@@ -20,13 +20,11 @@
     "url": "git+https://github.com/joshbuddy/exif-be-gone.git"
   },
   "license": "ISC",
-  "dependencies": {
-    "@types/stream-buffers": "^3.0.3"
-  },
   "devDependencies": {
     "@types/chai": "^4.2.12",
     "@types/mocha": "^8.0.2",
     "@types/node": "^18.6.3",
+    "@types/stream-buffers": "^3.0.3",
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "buffer-to-stream": "1.0.0",

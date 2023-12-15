@@ -1,6 +1,6 @@
 # Exif be gone
 
-Stream transformer to remove data that could be potentially private.
+Zero dependency stream transformer to remove data that could be potentially private.
 
 It currently looks for data in the app1 section that is either exif, xmp, or FLIR and removes it from the stream.
 

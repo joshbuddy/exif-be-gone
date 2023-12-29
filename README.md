@@ -2,7 +2,9 @@
 
 Zero dependency stream transformer to remove data that could be potentially private.
 
-It currently looks for data in the app1 section that is either exif, xmp, or FLIR and removes it from the stream.
+For jpegs and tiffs, it currently looks for data in the app1 section that is either exif, xmp, or FLIR and removes it from the stream.
+
+For png, it looks for `tIME`, `iTXt`, `tEXt`, `zTXt`, `eXIf` and `dSIG` chunks and removes those.
 
 ## Installation
 

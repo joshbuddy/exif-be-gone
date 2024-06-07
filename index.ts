@@ -3,6 +3,8 @@ import { Transform, type TransformOptions, type TransformCallback } from 'stream
 const app1Marker = Buffer.from('ffe1', 'hex')
 const exifMarker = Buffer.from('457869660000', 'hex') // Exif\0\0
 const pngMarker = Buffer.from('89504e470d0a1a0a', 'hex') // 211   P   N   G  \r  \n \032 \n
+const webp1Marker = Buffer.from('52494646', 'hex') // RIFF
+const webp2Marker = Buffer.from('57454250', 'hex') // WEBP
 const xmpMarker = Buffer.from('http://ns.adobe.com/xap', 'utf-8')
 const flirMarker = Buffer.from('FLIR', 'utf-8')
 
@@ -12,7 +14,7 @@ class ExifTransformer extends Transform {
   remainingScrubBytes: number | undefined
   remainingGoodBytes: number | undefined
   pending: Array<Buffer>
-  mode: 'png' | 'other' | undefined
+  mode: 'png' | 'webp' | 'other' | undefined
 
   constructor (options?: TransformOptions) {
     super(options)
@@ -22,10 +24,16 @@ class ExifTransformer extends Transform {
 
   override _transform (chunk: any, _: BufferEncoding, callback: TransformCallback) {
     if (this.mode === undefined) {
-      this.mode = pngMarker.equals(Uint8Array.prototype.slice.call(chunk, 0, 8)) ? 'png' : 'other'
-      if (this.mode === 'png') {
+      if (pngMarker.equals(Uint8Array.prototype.slice.call(chunk, 0, 8))) {
+        this.mode = 'png'
         this.push(Uint8Array.prototype.slice.call(chunk, 0, 8))
         chunk = Buffer.from(Uint8Array.prototype.slice.call(chunk, 8))
+      } else if (webp1Marker.equals(Uint8Array.prototype.slice.call(chunk, 0, 4)) && webp2Marker.equals(Uint8Array.prototype.slice.call(chunk, 8, 12))) {
+        this.mode = 'webp'
+        this.push(Uint8Array.prototype.slice.call(chunk, 0, 12))
+        chunk = Buffer.from(Uint8Array.prototype.slice.call(chunk, 12))
+      } else {
+        this.mode = 'other'
       }
     }
     this._scrub(false, chunk)
@@ -43,6 +51,7 @@ class ExifTransformer extends Transform {
     switch (this.mode) {
       case 'other': return this._scrubOther(atEnd, chunk)
       case 'png': return this._scrubPNG(atEnd, chunk)
+      case 'webp': return this._scrubWEBP(atEnd, chunk)
       default: throw new Error('unknown mode')
     }
   }
@@ -163,6 +172,46 @@ class ExifTransformer extends Transform {
       const remaining = Buffer.from(Uint8Array.prototype.slice.call(chunk, this.remainingGoodBytes))
       this.remainingGoodBytes = undefined
       return remaining
+    }
+  }
+
+  _scrubWEBP (atEnd: Boolean, chunk?: Buffer) {
+    let pendingChunk = chunk ? Buffer.concat([...this.pending, chunk]) : Buffer.concat(this.pending)
+
+    while (pendingChunk.length !== 0) {
+      pendingChunk = this._processPNGGood(pendingChunk)
+      if (this.remainingScrubBytes !== undefined) {
+        if (pendingChunk.length >= this.remainingScrubBytes) {
+          const remainingBuffer = Buffer.from(Uint8Array.prototype.slice.call(pendingChunk, this.remainingScrubBytes))
+          this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : []
+          this.remainingScrubBytes = undefined
+          // this chunk is too large, remove everything
+          return
+        }
+        this.remainingScrubBytes -= pendingChunk.length
+        this.pending.length = 0
+      }
+
+      if (pendingChunk.length === 0) return
+      if (pendingChunk.length < 8) {
+        if (atEnd) {
+          this.push(pendingChunk)
+        } else {
+          this.pending = [pendingChunk]
+        }
+        return
+      }
+
+      const chunkType = Uint8Array.prototype.slice.call(pendingChunk, 0, 4).toString()
+      const size = pendingChunk.readUInt32LE(4)
+      switch (chunkType) {
+        case 'EXIF':
+          this.remainingScrubBytes = size + 12
+          continue
+        default:
+          this.remainingGoodBytes = size + 12
+          continue
+      }
     }
   }
 }

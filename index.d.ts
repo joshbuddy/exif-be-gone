@@ -5,7 +5,7 @@ declare class ExifTransformer extends Transform {
     remainingScrubBytes: number | undefined;
     remainingGoodBytes: number | undefined;
     pending: Array<Buffer>;
-    mode: 'png' | 'other' | undefined;
+    mode: 'png' | 'webp' | 'other' | undefined;
     constructor(options?: TransformOptions);
     _transform(chunk: any, _: BufferEncoding, callback: TransformCallback): void;
     _final(callback: TransformCallback): void;
@@ -13,6 +13,7 @@ declare class ExifTransformer extends Transform {
     _scrubOther(atEnd: Boolean, chunk?: Buffer): void;
     _scrubPNG(atEnd: Boolean, chunk?: Buffer): void;
     _processPNGGood(chunk: Buffer): Buffer;
+    _scrubWEBP(atEnd: Boolean, chunk?: Buffer): void;
 }
 export default ExifTransformer;
 //# sourceMappingURL=index.d.ts.map

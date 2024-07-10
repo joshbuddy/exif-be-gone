@@ -28,6 +28,8 @@ var stream_1 = require("stream");
 var app1Marker = Buffer.from('ffe1', 'hex');
 var exifMarker = Buffer.from('457869660000', 'hex'); // Exif\0\0
 var pngMarker = Buffer.from('89504e470d0a1a0a', 'hex'); // 211   P   N   G  \r  \n \032 \n
+var webp1Marker = Buffer.from('52494646', 'hex'); // RIFF
+var webp2Marker = Buffer.from('57454250', 'hex'); // WEBP
 var xmpMarker = Buffer.from('http://ns.adobe.com/xap', 'utf-8');
 var flirMarker = Buffer.from('FLIR', 'utf-8');
 var maxMarkerLength = Math.max(exifMarker.length, xmpMarker.length, flirMarker.length);
@@ -41,10 +43,18 @@ var ExifTransformer = /** @class */ (function (_super) {
     }
     ExifTransformer.prototype._transform = function (chunk, _, callback) {
         if (this.mode === undefined) {
-            this.mode = pngMarker.equals(Uint8Array.prototype.slice.call(chunk, 0, 8)) ? 'png' : 'other';
-            if (this.mode === 'png') {
+            if (pngMarker.equals(Uint8Array.prototype.slice.call(chunk, 0, 8))) {
+                this.mode = 'png';
                 this.push(Uint8Array.prototype.slice.call(chunk, 0, 8));
                 chunk = Buffer.from(Uint8Array.prototype.slice.call(chunk, 8));
+            }
+            else if (webp1Marker.equals(Uint8Array.prototype.slice.call(chunk, 0, 4)) && webp2Marker.equals(Uint8Array.prototype.slice.call(chunk, 8, 12))) {
+                this.mode = 'webp';
+                this.push(Uint8Array.prototype.slice.call(chunk, 0, 12));
+                chunk = Buffer.from(Uint8Array.prototype.slice.call(chunk, 12));
+            }
+            else {
+                this.mode = 'other';
             }
         }
         this._scrub(false, chunk);
@@ -60,6 +70,7 @@ var ExifTransformer = /** @class */ (function (_super) {
         switch (this.mode) {
             case 'other': return this._scrubOther(atEnd, chunk);
             case 'png': return this._scrubPNG(atEnd, chunk);
+            case 'webp': return this._scrubWEBP(atEnd, chunk);
             default: throw new Error('unknown mode');
         }
     };
@@ -182,6 +193,44 @@ var ExifTransformer = /** @class */ (function (_super) {
             var remaining = Buffer.from(Uint8Array.prototype.slice.call(chunk, this.remainingGoodBytes));
             this.remainingGoodBytes = undefined;
             return remaining;
+        }
+    };
+    ExifTransformer.prototype._scrubWEBP = function (atEnd, chunk) {
+        var pendingChunk = chunk ? Buffer.concat(__spreadArray(__spreadArray([], this.pending, true), [chunk], false)) : Buffer.concat(this.pending);
+        while (pendingChunk.length !== 0) {
+            pendingChunk = this._processPNGGood(pendingChunk);
+            if (this.remainingScrubBytes !== undefined) {
+                if (pendingChunk.length >= this.remainingScrubBytes) {
+                    var remainingBuffer = Buffer.from(Uint8Array.prototype.slice.call(pendingChunk, this.remainingScrubBytes));
+                    this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : [];
+                    this.remainingScrubBytes = undefined;
+                    // this chunk is too large, remove everything
+                    return;
+                }
+                this.remainingScrubBytes -= pendingChunk.length;
+                this.pending.length = 0;
+            }
+            if (pendingChunk.length === 0)
+                return;
+            if (pendingChunk.length < 8) {
+                if (atEnd) {
+                    this.push(pendingChunk);
+                }
+                else {
+                    this.pending = [pendingChunk];
+                }
+                return;
+            }
+            var chunkType = Uint8Array.prototype.slice.call(pendingChunk, 0, 4).toString();
+            var size = pendingChunk.readUInt32LE(4);
+            switch (chunkType) {
+                case 'EXIF':
+                    this.remainingScrubBytes = size + 12;
+                    continue;
+                default:
+                    this.remainingGoodBytes = size + 12;
+                    continue;
+            }
         }
     };
     return ExifTransformer;

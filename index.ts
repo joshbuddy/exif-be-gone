@@ -123,16 +123,18 @@ class ExifTransformer extends Transform {
           this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : []
           this.remainingScrubBytes = undefined
           // this chunk is too large, remove everything
-          return
+        } else {
+          this.remainingScrubBytes -= pendingChunk.length
+          this.pending.length = 0
         }
-        this.remainingScrubBytes -= pendingChunk.length
-        this.pending.length = 0
+        return
       }
 
       if (pendingChunk.length === 0) return
       if (pendingChunk.length < 8) {
         if (atEnd) {
           this.push(pendingChunk)
+          this.pending.length = 0
         } else {
           this.pending = [pendingChunk]
         }
@@ -186,16 +188,18 @@ class ExifTransformer extends Transform {
           this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : []
           this.remainingScrubBytes = undefined
           // this chunk is too large, remove everything
-          return
+        } else {
+          this.remainingScrubBytes -= pendingChunk.length
+          this.pending.length = 0
         }
-        this.remainingScrubBytes -= pendingChunk.length
-        this.pending.length = 0
+        return
       }
 
       if (pendingChunk.length === 0) return
       if (pendingChunk.length < 8) {
         if (atEnd) {
           this.push(pendingChunk)
+          this.pending.length = 0
         } else {
           this.pending = [pendingChunk]
         }

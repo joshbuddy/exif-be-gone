@@ -144,16 +144,19 @@ var ExifTransformer = /** @class */ (function (_super) {
                     this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : [];
                     this.remainingScrubBytes = undefined;
                     // this chunk is too large, remove everything
-                    return;
                 }
-                this.remainingScrubBytes -= pendingChunk.length;
-                this.pending.length = 0;
+                else {
+                    this.remainingScrubBytes -= pendingChunk.length;
+                    this.pending.length = 0;
+                }
+                return;
             }
             if (pendingChunk.length === 0)
                 return;
             if (pendingChunk.length < 8) {
                 if (atEnd) {
                     this.push(pendingChunk);
+                    this.pending.length = 0;
                 }
                 else {
                     this.pending = [pendingChunk];
@@ -205,16 +208,19 @@ var ExifTransformer = /** @class */ (function (_super) {
                     this.pending = remainingBuffer.length !== 0 ? [remainingBuffer] : [];
                     this.remainingScrubBytes = undefined;
                     // this chunk is too large, remove everything
-                    return;
                 }
-                this.remainingScrubBytes -= pendingChunk.length;
-                this.pending.length = 0;
+                else {
+                    this.remainingScrubBytes -= pendingChunk.length;
+                    this.pending.length = 0;
+                }
+                return;
             }
             if (pendingChunk.length === 0)
                 return;
             if (pendingChunk.length < 8) {
                 if (atEnd) {
                     this.push(pendingChunk);
+                    this.pending.length = 0;
                 }
                 else {
                     this.pending = [pendingChunk];
